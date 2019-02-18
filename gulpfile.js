@@ -12,7 +12,7 @@ var gulp    = require('gulp'),
 // SASS - Compile Sass files into CSS
 // --------------------------------------------------
 
-gulp.task('sass', function () {
+gulp.task('sass', function (done) {
   // Theme
   gulp.src([
       './assets/include/scss/**/*.scss',
@@ -23,6 +23,7 @@ gulp.task('sass', function () {
     .pipe(sass({ outputStyle: 'expanded' }))
     .on('error', sass.logError)
     .pipe(gulp.dest('./assets/css/'));
+  done();
 });
 
 
@@ -42,12 +43,15 @@ gulp.task('sass-bootstrap', function() {
 
 // This handles watching and running tasks
 gulp.task('watch', function () {
-  gulp.watch('./assets/include/scss/**/*.scss', ['sass']);
-  gulp.watch('./assets/include/scss/vendors/bootstrap/**/*.scss', ['sass-bootstrap']);
+  // gulp.watch('./assets/include/scss/**/*.scss', ['sass']);
+  // gulp.watch('./assets/include/scss/vendors/bootstrap/**/*.scss', ['sass-bootstrap']);
+  gulp.watch('./assets/include/scss/**/*.scss', gulp.series('sass'));
+  gulp.watch('./assets/include/scss/vendors/bootstrap/**/*.scss', gulp.series('sass-bootstrap'));
 });
 
 // Lets us type "gulp" on the command line and run all of our tasks
-gulp.task('default', ['sass', 'sass-bootstrap', 'watch']);
+// gulp.task('default', ['sass', 'sass-bootstrap', 'watch']);
+gulp.task('default', gulp.series('sass', 'sass-bootstrap', 'watch'));
 
 
 // --------------------------------------------------
@@ -64,4 +68,5 @@ gulp.task('minCSS', function() {
   .pipe(gulp.dest('./assets/vendors/bootstrap/css/'));
 });
 
-gulp.task('distMinCSS', ['minCSS']);
+// gulp.task('distMinCSS', ['minCSS']);
+gulp.task('distMinCSS', gulp.series('minCSS'));
